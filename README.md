@@ -1,7 +1,7 @@
 # 🚀 DivisaAPI - API de Tipos de Cambio del BCV
 
 **Versión:** 1.1.0  
-**Última Actualización:** 19 de Diciembre, 2024
+**Última Actualización:** 10 de Agosto, 2025
 
 Una API moderna y robusta para obtener tipos de cambio del Banco Central de Venezuela (BCV) con interfaz web integrada y sistema de configuración flexible.
 
@@ -269,5 +269,6 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 - **Configuración**: Ver `env.example` y `config.py`
 
 ---
+
 
 **DivisaAPI v1.1.0** - Una API moderna para tipos de cambio del BCV 🇻🇪 
