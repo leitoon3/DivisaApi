@@ -1,0 +1,100 @@
+/* Custom styles for BCV Exchange Rate API */
+
+.currency-symbol {
+    line-height: 1;
+}
+
+.rate-value {
+    color: var(--bs-primary);
+    font-family: 'Courier New', monospace;
+}
+
+.api-endpoint {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.api-endpoint:hover {
+    background-color: var(--bs-primary-bg-subtle);
+    border-color: var(--bs-primary);
+}
+
+.api-endpoint.active {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+pre {
+    max-height: 400px;
+    overflow-y: auto;
+    font-size: 0.875rem;
+}
+
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.border-primary {
+    border-color: var(--bs-primary) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .display-6 {
+        font-size: 1.25rem;
+    }
+}
+
+/* Loading animation */
+.spinner-border {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Code highlighting */
+code {
+    background-color: var(--bs-dark);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+/* Table styling */
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+/* Badge styling */
+.badge {
+    font-size: 0.75em;
+}
+
+/* Alert improvements */
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+/* Footer styling */
+footer {
+    margin-top: 3rem;
+}
+
+/* Utility classes */
+.text-decoration-none:hover {
+    text-decoration: underline !important;
+}

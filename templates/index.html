@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DivisaAPI - Tipos de Cambio BCV</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="API moderna para tipos de cambio del Banco Central de Venezuela con interfaz web integrada">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DivisaAPI">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="DivisaAPI">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/icon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/icon-96x96.png">
+    <link rel="apple-touch-icon" href="/static/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/static/icons/icon-152x152.png">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons@4.29.1/dist/feather.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- PWA CSS -->
+    <link rel="stylesheet" href="/static/css/app.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--card-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        /* Header Styles */
+        .hero-header {
+            background: var(--gradient-primary);
+            padding: 4rem 0 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        /* Card Styles */
+        .custom-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .custom-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+            border-color: var(--primary-color);
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 16px 16px 0 0;
+            padding: 1.5rem;
+        }
+
+        /* Currency Cards */
+        .currency-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(99, 102, 241, 0.05) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .currency-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .currency-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .currency-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .currency-symbol {
+            font-size: 3rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .rate-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--success-color);
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Converter Section */
+        .converter-section {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .converter-input {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            padding: 1rem;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .converter-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+            outline: none;
+        }
+
+        .currency-selector {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .currency-selector:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+            outline: none;
+        }
+
+        /* Buttons */
+        .btn-custom {
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-custom:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary-custom {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-success-custom {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-copy {
+            background: var(--gradient-secondary);
+            color: white;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-copy:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+        }
+
+        /* Copy Animation */
+        .copy-feedback {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .copy-feedback.show {
+            transform: translateX(0);
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .currency-card {
+                padding: 1.5rem;
+            }
+            
+            .rate-value {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Background Elements -->
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+
+    <!-- Hero Header -->
+    <header class="hero-header">
+        <div class="container position-relative">
+            <div class="text-center">
+                <h1 class="hero-title">
+                    <i data-feather="dollar-sign" class="me-3"></i>
+                    DivisaAPI
+                </h1>
+                <p class="hero-subtitle">
+                    API inteligente de tipos de cambio del BCV con cache de base de datos
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i data-feather="zap" class="me-1"></i>
+                        Respuestas Rápidas
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i data-feather="database" class="me-1"></i>
+                        Cache Inteligente
+                    </span>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i data-feather="refresh-cw" class="me-1"></i>
+                        Actualizaciones Automáticas
+                    </span>
+                    <span id="apiStatusBadge" class="badge bg-secondary px-3 py-2">
+                        <i data-feather="circle" class="me-1"></i>
+                        Verificando API...
+                    </span>
+                    <span id="online-status" class="badge px-3 py-2">
+                        <i data-feather="wifi" class="me-1"></i>
+                        En línea
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mt-5">
+        <!-- Live Rates Display -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="custom-card">
+                    <div class="card-header-custom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0">
+                                <i data-feather="trending-up" class="me-2"></i>
+                                Tipos de Cambio en Tiempo Real
+                            </h3>
+                            <button id="refreshRates" class="btn btn-primary-custom btn-custom">
+                                <i data-feather="refresh-cw" class="me-1"></i>
+                                Actualizar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="ratesContainer">
+                            <div class="text-center py-5">
+                                <div class="loading-spinner mx-auto mb-3"></div>
+                                <p class="text-muted">Obteniendo tipos de cambio...</p>
+                            </div>
+                        </div>
+                        <div id="lastUpdated" class="text-center text-muted small mt-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Currency Converter -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="converter-section">
+                    <div class="text-center mb-4">
+                        <h3 class="mb-3">
+                            <i data-feather="calculator" class="me-2"></i>
+                            Convertidor de Divisas
+                        </h3>
+                        <p class="text-muted">Convierte entre diferentes monedas usando los tipos de cambio actuales del BCV</p>
+                        <div class="alert alert-info bg-dark border-info border-opacity-25 mt-3">
+                            <i data-feather="info" class="me-2"></i>
+                            <strong>Ejemplo:</strong> Si 1 USD = 131.24 VES, entonces para convertir 10 USD a VES: 
+                            <strong>10 USD × 131.24 = 1,312.40 VES</strong>
+                            <br><small class="text-muted">Multiplicamos directamente por la tasa de cambio del BCV</small>
+                        </div>
+                    
+                    <div class="row g-4 justify-content-center">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Cantidad</label>
+                            <input type="number" id="converterAmount" class="form-control converter-input" 
+                                   placeholder="100" value="100" min="0" step="0.01">
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">De</label>
+                            <select id="fromCurrency" class="form-select currency-selector">
+                                <option value="USD">USD - Dólar</option>
+                                <option value="VES">VES - Bolívar</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="CNY">CNY - Yuan</option>
+                                <option value="TRY">TRY - Lira</option>
+                                <option value="RUB">RUB - Rublo</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">A</label>
+                            <select id="toCurrency" class="form-select currency-selector">
+                                <option value="VES">VES - Bolívar</option>
+                                <option value="USD">USD - Dólar</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="CNY">CNY - Yuan</option>
+                                <option value="TRY">TRY - Lira</option>
+                                <option value="RUB">RUB - Rublo</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button id="convertBtn" class="btn btn-success-custom btn-custom w-100">
+                                <i data-feather="arrow-right" class="me-1"></i>
+                                Convertir
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="conversionResult" class="mt-4" style="display: none;">
+                        <div class="text-center">
+                            <div class="card bg-dark border-success border-opacity-25">
+                                <div class="card-body py-4">
+                                    <h4 class="text-success mb-3">
+                                        <i data-feather="check-circle" class="me-2"></i>
+                                        Resultado de Conversión
+                                    </h4>
+                                    <div id="conversionDetails" class="mb-3"></div>
+                                    <button id="copyResult" class="btn btn-copy">
+                                        <i data-feather="copy" class="me-1"></i>
+                                        Copiar Resultado
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Documentation -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="custom-card">
+                    <div class="card-header-custom">
+                        <h3 class="mb-0">
+                            <i data-feather="code" class="me-2"></i>
+                            Documentación de la API
+                        </h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="mb-3">Endpoints Principales</h5>
+                                <div class="list-group">
+                                    <div class="list-group-item bg-transparent border-secondary">
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1 text-primary">GET /api/rates</h6>
+                                                <p class="mb-1 small text-muted">Todas las divisas disponibles</p>
+                                            </div>
+                                            <button class="btn btn-sm btn-outline-primary copy-endpoint" 
+                                                    data-endpoint="/api/rates">
+                                                <i data-feather="copy" class="me-1"></i>
+                                                Copiar
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="list-group-item bg-transparent border-secondary">
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1 text-success">GET /api/convert</h6>
+                                                <p class="mb-1 small text-muted">Convertir entre divisas</p>
+                                            </div>
+                                            <button class="btn btn-sm btn-outline-success copy-endpoint" 
+                                                    data-endpoint="/api/convert?amount=10&from=USD&to=VES">
+                                                <i data-feather="copy" class="me-1"></i>
+                                                Copiar
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="list-group-item bg-transparent border-secondary">
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1 text-warning">GET /api/status</h6>
+                                                <p class="mb-1 small text-muted">Estado del sistema</p>
+                                            </div>
+                                            <button class="btn btn-sm btn-outline-warning copy-endpoint" 
+                                                    data-endpoint="/api/status">
+                                                <i data-feather="copy" class="me-1"></i>
+                                                Copiar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5 class="mb-3">Probar API</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">Endpoint a probar:</label>
+                                    <input type="text" id="testEndpoint" class="form-control converter-input" 
+                                           placeholder="/api/rates" value="/api/rates">
+                                </div>
+                                <button id="testApiBtn" class="btn btn-primary-custom btn-custom mb-3">
+                                    <i data-feather="play" class="me-1"></i>
+                                    Probar Endpoint
+                                </button>
+                                
+                                <div id="apiResponse" class="bg-dark p-3 rounded" style="display: none;">
+                                    <h6 class="text-muted mb-2">Respuesta:</h6>
+                                    <pre id="responseContent" class="text-light small"></pre>
+                                    <div id="responseInfo" class="mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center py-5 border-top border-secondary">
+            <div class="container">
+                <p class="text-muted mb-0">
+                    <i data-feather="info" class="me-1"></i>
+                    DivisaAPI - Datos obtenidos del 
+                    <a href="https://www.bcv.org.ve/" target="_blank" class="text-decoration-none text-primary">
+                        Banco Central de Venezuela
+                    </a>
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Copy Feedback -->
+    <div id="copyFeedback" class="copy-feedback">
+        <i data-feather="check" class="me-2"></i>
+        ¡Copiado al portapapeles!
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Initialize Feather Icons with error handling
+        function initializeFeatherIcons() {
+            try {
+                if (typeof feather !== 'undefined') {
+                    feather.replace();
+                    console.log('✅ Feather Icons inicializado correctamente');
+                } else {
+                    console.warn('⚠️ Feather Icons no está disponible, usando fallback');
+                    // Fallback: reemplazar iconos con texto simple
+                    document.querySelectorAll('[data-feather]').forEach(el => {
+                        const iconName = el.getAttribute('data-feather');
+                        el.innerHTML = getIconFallback(iconName);
+                        el.removeAttribute('data-feather');
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error al inicializar Feather Icons:', error);
+                // Fallback en caso de error
+                document.querySelectorAll('[data-feather]').forEach(el => {
+                    const iconName = el.getAttribute('data-feather');
+                    el.innerHTML = getIconFallback(iconName);
+                    el.removeAttribute('data-feather');
+                });
+            }
+        }
+
+        // Fallback function for icons
+        function getIconFallback(iconName) {
+            const fallbacks = {
+                'dollar-sign': '💲',
+                'trending-up': '📈',
+                'refresh-cw': '🔄',
+                'calculator': '🧮',
+                'arrow-right': '➡️',
+                'check-circle': '✅',
+                'copy': '📋',
+                'code': '💻',
+                'play': '▶️',
+                'info': 'ℹ️',
+                'clock': '🕐',
+                'alert-circle': '⚠️',
+                'loader': '⏳',
+                'zap': '⚡',
+                'database': '🗄️',
+                'check': '✓',
+                'circle': '⚪',
+                'wifi': '📶',
+                'download': '⬇️'
+            };
+            return fallbacks[iconName] || '•';
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeFeatherIcons);
+        } else {
+            initializeFeatherIcons();
+        }
+
+        // Currency symbols and names
+        const currencySymbols = {
+            'USD': '$',
+            'EUR': '€',
+            'CNY': '¥',
+            'TRY': '₺',
+            'RUB': '₽',
+            'VES': 'Bs.'
+        };
+
+        const currencyNames = {
+            'USD': 'Dólar Estadounidense',
+            'EUR': 'Euro',
+            'CNY': 'Yuan Chino',
+            'TRY': 'Lira Turca',
+            'RUB': 'Rublo Ruso',
+            'VES': 'Bolívar Venezolano'
+        };
+
+        // Load exchange rates
+        async function loadRates() {
+            const container = document.getElementById('ratesContainer');
+            const lastUpdated = document.getElementById('lastUpdated');
+            const refreshBtn = document.getElementById('refreshRates');
+            const apiStatusBadge = document.getElementById('apiStatusBadge');
+            const onlineStatusBadge = document.getElementById('online-status');
+            
+            console.log('🔄 Iniciando carga de tipos de cambio...');
+            
+            // Deshabilitar el botón de refrescar durante la carga
+            if (refreshBtn) {
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '<i data-feather="loader" class="me-1"></i>Cargando...';
+                initializeFeatherIcons();
+            }
+
+            // Actualizar el estado de la API
+            apiStatusBadge.innerHTML = '<i data-feather="loader" class="me-1"></i>Verificando API...';
+            initializeFeatherIcons();
+            
+            // Crear un AbortController para timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                console.log('⏰ Timeout alcanzado (10s) - Abortando solicitud');
+                controller.abort();
+            }, 10000); // 10 segundos timeout
+            
+            // Timeout adicional más agresivo para casos extremos
+            const aggressiveTimeoutId = setTimeout(() => {
+                console.log('🚨 Timeout agresivo (15s) - Forzando abort');
+                controller.abort();
+            }, 15000); // 15 segundos timeout
+            
+            try {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="loading-spinner mx-auto mb-3"></div>
+                        <p class="text-muted">Obteniendo tipos de cambio...</p>
+                        <small class="text-muted d-block">Esto puede tomar unos segundos</small>
+                    </div>
+                `;
+
+                console.log('📡 Enviando solicitud a /api/rates...');
+                const response = await fetch('/api/rates', {
+                    signal: controller.signal
+                });
+                
+                // Limpiar el timeout si la respuesta llega a tiempo
+                clearTimeout(timeoutId);
+                clearTimeout(aggressiveTimeoutId); // Limpiar el timeout agresivo
+                console.log(`✅ Respuesta recibida: ${response.status} ${response.statusText}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('📊 Datos recibidos:', data);
+
+                if (data.success && data.data && data.data.rates) {
+                    const rates = data.data.rates;
+                    console.log(`💰 Tipos de cambio obtenidos: ${Object.keys(rates).length} divisas`);
+                    
+                    let html = '<div class="row g-4">';
+                    
+                    Object.entries(rates).forEach(([currency, rate]) => {
+                        const symbol = currencySymbols[currency] || currency;
+                        const name = currencyNames[currency] || currency;
+                        
+                        html += `
+                            <div class="col-md-6 col-lg-4">
+                                <div class="currency-card">
+                                    <div class="currency-symbol">${symbol}</div>
+                                    <h5 class="mb-2">${currency}</h5>
+                                    <p class="text-muted small mb-3">${name}</p>
+                                    <div class="rate-value">1 ${currency} = ${parseFloat(rate).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 8})} VES</div>
+                                    <small class="text-muted">Tasa de cambio</small>
+                                    <button class="btn btn-copy btn-sm mt-3 copy-rate" 
+                                            data-rate="${rate}" data-currency="${currency}">
+                                        <i data-feather="copy" class="me-1"></i>
+                                        Copiar
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                    container.innerHTML = html;
+                    
+                    // Update timestamp
+                    const updateTime = new Date(data.timestamp).toLocaleString('es-VE');
+                    lastUpdated.innerHTML = `
+                        <i data-feather="clock" class="me-1"></i>
+                        Última actualización: ${updateTime}
+                        ${data.data.date ? `| Fecha valor: ${data.data.date}` : ''}
+                    `;
+                    initializeFeatherIcons();
+                    
+                    // Add copy event listeners
+                    document.querySelectorAll('.copy-rate').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const rate = btn.dataset.rate;
+                            const currency = btn.dataset.currency;
+                            const textToCopy = `${currency}: ${rate} VES`;
+                            copyToClipboard(textToCopy, `${currency} copiado`);
+                        });
+                    });
+                    
+                    console.log('🎉 Interfaz actualizada exitosamente');
+                    apiStatusBadge.innerHTML = '<i data-feather="check-circle" class="me-1"></i>API funcionando';
+                    initializeFeatherIcons();
+                } else {
+                    throw new Error(data.message || 'No se pudieron obtener los tipos de cambio');
+                }
+            } catch (error) {
+                // Limpiar el timeout en caso de error
+                clearTimeout(timeoutId);
+                clearTimeout(aggressiveTimeoutId); // Limpiar el timeout agresivo
+                
+                console.error('❌ Error en loadRates:', error);
+                
+                let errorMessage = 'Error al cargar los tipos de cambio';
+                
+                if (error.name === 'AbortError') {
+                    errorMessage = 'La solicitud tardó demasiado tiempo. Por favor, verifica tu conexión e intenta de nuevo.';
+                    console.log('⏰ Error de timeout - Solicitud abortada');
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = 'Error de conexión. Verifica que la API esté funcionando.';
+                    console.log('🌐 Error de conexión - Fallo en fetch');
+                } else if (error.message.includes('HTTP')) {
+                    errorMessage = `Error del servidor: ${error.message}`;
+                    console.log('🚨 Error HTTP del servidor');
+                } else {
+                    errorMessage = `${errorMessage}: ${error.message}`;
+                    console.log('⚠️ Error general:', error.message);
+                }
+                
+                container.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <i data-feather="alert-circle" class="me-2"></i>
+                        ${errorMessage}
+                        <div class="mt-3">
+                            <button class="btn btn-outline-danger btn-sm me-2" onclick="loadRates()">
+                                <i data-feather="refresh-cw" class="me-1"></i>
+                                Reintentar
+                            </button>
+                            <button class="btn btn-outline-warning btn-sm" onclick="forceReload()">
+                                <i data-feather="zap" class="me-1"></i>
+                                Forzar Recarga
+                            </button>
+                        </div>
+                    </div>
+                `;
+                initializeFeatherIcons();
+                apiStatusBadge.innerHTML = '<i data-feather="alert-circle" class="me-1"></i>API no disponible';
+                initializeFeatherIcons();
+            } finally {
+                // Restaurar el botón de refrescar
+                if (refreshBtn) {
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '<i data-feather="refresh-cw" class="me-1"></i>Actualizar';
+                    initializeFeatherIcons();
+                }
+                console.log('🏁 Función loadRates completada');
+            }
+        }
+
+        // Currency conversion
+        async function convertCurrency() {
+            const amount = parseFloat(document.getElementById('converterAmount').value);
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const toCurrency = document.getElementById('toCurrency').value;
+            
+            if (!amount || amount <= 0) {
+                alert('Por favor ingresa una cantidad válida');
+                return;
+            }
+            
+            if (fromCurrency === toCurrency) {
+                showConversionResult(amount, fromCurrency, amount, toCurrency, 1);
+                return;
+            }
+            
+            try {
+                // Obtener las tasas actuales del contenedor
+                const ratesContainer = document.getElementById('ratesContainer');
+                const rateElements = ratesContainer.querySelectorAll('.copy-rate');
+                
+                if (rateElements.length === 0) {
+                    alert('Primero debes cargar los tipos de cambio. Haz clic en "Actualizar".');
+                    return;
+                }
+                
+                // Crear un objeto con las tasas disponibles
+                const rates = {};
+                rateElements.forEach(element => {
+                    const currency = element.dataset.currency;
+                    const rate = parseFloat(element.dataset.rate);
+                    rates[currency] = rate;
+                });
+                
+                console.log('💰 Tasas disponibles para conversión:', rates);
+                
+                let conversionRate, resultAmount;
+                
+                // Lógica de conversión corregida
+                if (fromCurrency === 'VES' && toCurrency !== 'VES') {
+                    // De VES a otra moneda: VES ÷ tasa = cantidad en la otra moneda
+                    conversionRate = 1 / rates[toCurrency];
+                    resultAmount = amount * conversionRate;
+                    console.log(`🔄 Conversión: ${amount} VES ÷ ${rates[toCurrency]} = ${resultAmount} ${toCurrency}`);
+                } else if (fromCurrency !== 'VES' && toCurrency === 'VES') {
+                    // De otra moneda a VES: cantidad × tasa = VES
+                    conversionRate = rates[fromCurrency];
+                    resultAmount = amount * conversionRate;
+                    console.log(`🔄 Conversión: ${amount} ${fromCurrency} × ${rates[fromCurrency]} = ${resultAmount} VES`);
+                } else if (fromCurrency !== 'VES' && toCurrency !== 'VES') {
+                    // Entre dos monedas extranjeras: usar VES como intermediario
+                    const fromToVES = amount * rates[fromCurrency];
+                    conversionRate = 1 / rates[toCurrency];
+                    resultAmount = fromToVES * conversionRate;
+                    console.log(`🔄 Conversión cruzada: ${amount} ${fromCurrency} → ${fromToVES} VES → ${resultAmount} ${toCurrency}`);
+                } else {
+                    throw new Error('Combinación de monedas no válida');
+                }
+                
+                showConversionResult(amount, fromCurrency, resultAmount, toCurrency, conversionRate);
+                
+            } catch (error) {
+                console.error('❌ Error en conversión:', error);
+                alert('Error al realizar la conversión: ' + error.message);
+            }
+        }
+
+        function showConversionResult(fromAmount, fromCurrency, toAmount, toCurrency, rate) {
+            const resultDiv = document.getElementById('conversionResult');
+            const detailsDiv = document.getElementById('conversionDetails');
+            
+            // Formatear los números según la moneda
+            const formatAmount = (amount, currency) => {
+                if (currency === 'VES') {
+                    return amount.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                } else {
+                    return amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 6});
+                }
+            };
+            
+            // Generar explicación del cálculo
+            let calculationExplanation = '';
+            if (fromCurrency === 'VES' && toCurrency !== 'VES') {
+                // Mostrar como multiplicación: 100 VES × (1/131.24) = 0.76 USD
+                const multiplier = (1/rate).toFixed(6);
+                calculationExplanation = `${fromAmount} VES × ${multiplier} = ${toAmount.toFixed(6)} ${toCurrency}`;
+            } else if (fromCurrency !== 'VES' && toCurrency === 'VES') {
+                calculationExplanation = `${fromAmount} ${fromCurrency} × ${rate.toFixed(2)} = ${toAmount.toFixed(2)} VES`;
+            } else {
+                calculationExplanation = `${fromAmount} ${fromCurrency} → ${(fromAmount * (fromCurrency === 'VES' ? 1 : (1/rate))).toFixed(2)} VES → ${toAmount.toFixed(6)} ${toCurrency}`;
+            }
+            
+            detailsDiv.innerHTML = `
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h5 class="text-primary">${formatAmount(fromAmount, fromCurrency)}</h5>
+                            <small class="text-muted">${fromCurrency}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <i data-feather="arrow-right" class="text-muted"></i>
+                            <br>
+                            <small class="text-muted">Tipo: ${rate.toFixed(6)}</small>
+                            <br>
+                            <small class="text-muted">${fromCurrency} → ${toCurrency}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h5 class="text-success">${formatAmount(toAmount, toCurrency)}</h5>
+                            <small class="text-muted">${toCurrency}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="text-center">
+                            <small class="text-muted">
+                                <i data-feather="info" class="me-1"></i>
+                                <strong>Cálculo:</strong> ${calculationExplanation}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultDiv.style.display = 'block';
+            initializeFeatherIcons();
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard(text, message = 'Copiado al portapapeles') {
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyFeedback(message);
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopyFeedback(message);
+            });
+        }
+
+        function showCopyFeedback(message) {
+            const feedback = document.getElementById('copyFeedback');
+            feedback.innerHTML = `<i data-feather="check" class="me-2"></i>${message}`;
+            feedback.classList.add('show');
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 2000);
+            
+            initializeFeatherIcons();
+        }
+
+        // Test API endpoint
+        async function testApiEndpoint() {
+            const endpoint = document.getElementById('testEndpoint').value;
+            const responseDiv = document.getElementById('apiResponse');
+            const contentDiv = document.getElementById('responseContent');
+            const infoDiv = document.getElementById('responseInfo');
+            
+            if (!endpoint) {
+                alert('Por favor ingresa un endpoint válido');
+                return;
+            }
+            
+            try {
+                responseDiv.style.display = 'block';
+                contentDiv.textContent = 'Cargando...';
+                infoDiv.innerHTML = '';
+                
+                const startTime = Date.now();
+                const response = await fetch(endpoint);
+                const endTime = Date.now();
+                const data = await response.json();
+                
+                contentDiv.textContent = JSON.stringify(data, null, 2);
+                
+                const statusClass = response.ok ? 'text-success' : 'text-danger';
+                infoDiv.innerHTML = `
+                    <span class="${statusClass}">
+                        <i data-feather="info" class="me-1"></i>
+                        Status: ${response.status} ${response.statusText} | 
+                        Tiempo: ${endTime - startTime}ms
+                    </span>
+                `;
+                initializeFeatherIcons();
+            } catch (error) {
+                contentDiv.textContent = `Error: ${error.message}`;
+                infoDiv.innerHTML = `
+                    <span class="text-danger">
+                        <i data-feather="alert-circle" class="me-1"></i>
+                        Error de conexión
+                    </span>
+                `;
+                initializeFeatherIcons();
+            }
+        }
+
+        // Force reload function for extreme cases
+        function forceReload() {
+            console.log('🔄 Forzando recarga completa de la página...');
+            window.location.reload(true);
+        }
+
+        // Event listeners
+        document.getElementById('refreshRates').addEventListener('click', loadRates);
+        document.getElementById('convertBtn').addEventListener('click', convertCurrency);
+        document.getElementById('testApiBtn').addEventListener('click', testApiEndpoint);
+
+        // Copy endpoint buttons
+        document.querySelectorAll('.copy-endpoint').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const endpoint = btn.dataset.endpoint;
+                copyToClipboard(endpoint, 'Endpoint copiado');
+            });
+        });
+
+        // Copy conversion result
+        document.getElementById('copyResult').addEventListener('click', () => {
+            const details = document.getElementById('conversionDetails').textContent;
+            copyToClipboard(details, 'Resultado copiado');
+        });
+
+        // Load rates on page load
+        loadRates();
+    </script>
+    
+    <!-- PWA JavaScript -->
+    <script src="/static/js/app.js"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+                        
+                        // Verificar actualizaciones
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('🔄 Nueva versión disponible');
+                                    showUpdateNotification();
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('❌ Error registrando Service Worker:', error);
+                    });
+            });
+        }
+        
+        // Mostrar notificación de actualización
+        function showUpdateNotification() {
+            if (window.divisaPWA) {
+                window.divisaPWA.showUpdateNotification();
+            }
+        }
+        
+        // Función para instalar PWA manualmente
+        function installPWA() {
+            if (window.divisaPWA) {
+                window.divisaPWA.installApp();
+            }
+        }
+        
+        // Función para verificar estado de la PWA
+        function checkPWAStatus() {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                                window.navigator.standalone === true;
+            
+            console.log('📱 PWA Status:', {
+                isStandalone: isStandalone,
+                isOnline: navigator.onLine,
+                hasServiceWorker: 'serviceWorker' in navigator
+            });
+            
+            return {
+                isStandalone,
+                isOnline: navigator.onLine,
+                hasServiceWorker: 'serviceWorker' in navigator
+            };
+        }
+        
+        // Verificar estado al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                checkPWAStatus();
+            }, 1000);
+        });
+    </script>
+    
+    <!-- Botón Flotante de Instalación PWA -->
+    <button id="pwa-install-btn" class="pwa-install-btn" onclick="installPWA()" style="display: none;">
+        <i data-feather="download"></i>
+    </button>
+    
+    <!-- Indicador de Progreso PWA -->
+    <div class="pwa-progress" style="display: none;">
+        <div class="pwa-progress-bar"></div>
+    </div>
+    
+    <!-- Script para mostrar/ocultar botón de instalación -->
+    <script>
+        // Mostrar botón de instalación si es apropiado
+        function updateInstallButton() {
+            const installBtn = document.getElementById('pwa-install-btn');
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                                window.navigator.standalone === true;
+            
+            if (installBtn) {
+                if (isStandalone) {
+                    installBtn.style.display = 'none';
+                } else if (window.divisaPWA && window.divisaPWA.deferredPrompt) {
+                    installBtn.style.display = 'flex';
+                } else {
+                    installBtn.style.display = 'none';
+                }
+            }
+        }
+        
+        // Actualizar botón cuando cambie el estado
+        window.addEventListener('appinstalled', () => {
+            updateInstallButton();
+        });
+        
+        // Verificar estado inicial
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(updateInstallButton, 2000);
+        });
+    </script>
+</body>
+</html>
